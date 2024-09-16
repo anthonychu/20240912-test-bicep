@@ -1,0 +1,84 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.29.47.4906",
+      "templateHash": "2229806311441671779"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.App/jobs",
+      "apiVersion": "2024-02-02-preview",
+      "name": "test-job",
+      "location": "Canada Central",
+      "properties": {
+        "environmentId": "[reference(resourceId('Microsoft.Resources/deployments', 'container-app-environment'), '2022-09-01').outputs.id.value]",
+        "workloadProfileName": "Consumption",
+        "configuration": {
+          "triggerType": "Schedule",
+          "replicaTimeout": 1800,
+          "replicaRetryLimit": 0,
+          "scheduleTriggerConfig": {
+            "replicaCompletionCount": 1,
+            "cronExpression": "*/5 * * * *",
+            "parallelism": 1
+          }
+        },
+        "template": {
+          "containers": [
+            {
+              "image": "ubuntu",
+              "name": "job",
+              "command": [
+                "/bin/bash"
+              ],
+              "args": [
+                "-c",
+                "echo \"Hello, World!\""
+              ],
+              "resources": {
+                "cpu": 1,
+                "memory": "2Gi"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'container-app-environment')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "container-app-environment",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.29.47.4906",
+              "templateHash": "8929129522625419422"
+            }
+          },
+          "resources": [],
+          "outputs": {
+            "id": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.App/managedEnvironments', 'env-v5q2k4wr4x2x4')]"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
